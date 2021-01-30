@@ -1,0 +1,150 @@
+<!doctype html>
+
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+
+  <title>Математический диктант</title>
+
+  
+
+</head>
+
+<style>
+body {
+  font-family: Arial;
+}
+.wrapper {
+  display: flex;
+  margin: 20px
+}
+
+.primer {
+  font: bold 160px Arial;
+  color: #009688;
+}
+
+.btnStart {
+  margin-left: 40px;
+}
+
+.speed {
+  margin-right: 20px;
+}
+</style>
+
+<script>
+var synth = window.speechSynthesis;
+
+var mathApp = {
+  init: function() {
+    this.btnStart = document.getElementsByClassName('btnStart')[0];
+    this.btnShowAnswers = document.getElementsByClassName('btnShowAnswers')[0];
+    this.list = document.getElementsByClassName('list')[0];
+    this.primer = document.getElementsByClassName('primer')[0];
+    this.timerEl = document.getElementsByClassName('timerEl')[0];
+    this.speed = document.getElementsByClassName('speed')[0];
+    this.testsNum = document.getElementsByClassName('testsNum')[0];
+    this.sound = document.getElementById('sound1');
+    this.counter = 0;
+    
+    
+    this.btnStart.addEventListener('click', this.startStop.bind(this));
+    this.btnShowAnswers.addEventListener('click', function(){
+      this.list.removeAttribute('hidden');
+      this.btnShowAnswers.setAttribute('hidden','hidden');
+    }.bind(this));
+    
+   
+    
+    
+  },
+  
+  say: function(text) {
+    var utterThis = new SpeechSynthesisUtterance(text);
+    //utterThis.lang = 'ru-RU';
+
+    //utterThis.pitch = pitch.value;
+    //utterThis.rate = rate.value;
+    synth.speak(utterThis);
+  },
+  
+  startStop: function() {
+    if (!this.started) {
+      this.started = true;
+      this.btnStart.innerText = 'Стоп';
+      this.timer = setInterval(this.showPrimer.bind(this), this.speed.value * 1000);
+      this.btnShowAnswers.setAttribute('hidden','hidden');
+      this.list.setAttribute('hidden','hidden');
+      this.primer.innerText = '';
+      this.list.innerHTML = '';
+    } else {
+      this.started = false;
+      this.btnStart.innerText = 'Старт';
+      this.btnShowAnswers.removeAttribute('hidden');
+      clearInterval(this.timer);
+      this.counter = 0;
+    }
+  },
+  
+  getRand: function(from, to) {
+    return from + Math.round(Math.random() * (to - from));
+  },
+
+  showPrimer: function() {
+    this.counter++;
+    if (this.counter >= this.testsNum.value)  this.startStop();
+    let x = this.getRand(2,9);
+    let y = this.getRand(2,9);
+    let primer = `${x} x ${y}`;
+    let primerSay = `${x} на ${y}`;
+    let answer = `${primer} = ${x*y}`;
+    this.primer.innerText = primer;
+    
+    let listItemEl = document.createElement('li');
+    listItemEl.innerText = answer;
+    this.list.appendChild(listItemEl);
+    this.say(primerSay);
+    //this.sound.play();
+  }
+}
+
+mathApp.init();
+</script>
+
+<body>
+ 
+ <h1>Математический диктант</h1>
+
+<label for id="speed">Время на ответ: </label>
+<select class="speed" id="speed">
+  <option value="2">2 сек.</option>
+  <option value="3">3 сек.</option>
+  <option value="4" selected>4 сек.</option>
+  <option value="5">5 сек.</option>
+  <option value="6">6 сек.</option>
+  <option value="7">7 сек.</option>
+</select>
+
+<label for id="testsNum">Примеров: </label>
+<select class="testsNum" id="testsNum">
+  <option value="10">10</option>
+  <option value="20" selected>20</option>
+  <option value="30">30</option>
+</select>
+
+<button class="btnStart btn btn-primary">Старт</button>
+<button class="btnShowAnswers" hidden>Ответы</button>
+
+<div class="wrapper">
+  <div class="primer"></div>
+  <div class="timerEl"></div>
+  <ol class="list" hidden></ol>
+</div>
+
+<audio src="https://freewavesamples.com/files/Alesis-Sanctuary-QCard-Music-Box-C6.wav" id="sound1"/>
+
+ 
+ 
+</body>
+</html>
